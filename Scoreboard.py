@@ -40,7 +40,7 @@ class Scoreboard():
 		self.level_image_rect = self.level_image.get_rect()
 		self.level_image_rect.left, self.level_image_rect.top = 10, 10
 	
-	def prep_fish(self,score,state,screen):
+	def prep_fish(self,state,screen):
 		
 		for fish_number in range(state.fish_left):
 				create_fish = Fish(screen)

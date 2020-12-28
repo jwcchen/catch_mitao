@@ -136,7 +136,9 @@ while True:
                                 d = shelve.open('score') 
 
                                 #update score
+
                                 score = score + get_score
+                                #print(score)
                                 sb.prep_score(settings,score)
                                 #update high score
                                 if score > high_score:
@@ -165,7 +167,10 @@ while True:
                         if home_button.rect.collidepoint(pygame.mouse.get_pos()):
                             state.active = False
                             break_flag = True
-                            state.initiate(sb,play_button,settings,screen)
+                            state.initiate(sb,play_button,settings,screen,state)
+                            cat_position = {0:(600,400)}
+                            score = 0
+                            
                             break
 
                 if break_flag == True:
@@ -216,7 +221,7 @@ while True:
 
                 #prep fish part 1
                 if state.fish == []:
-                    sb.prep_fish(score,state,screen)
+                    sb.prep_fish(state,screen)
                 else:
                     if len(state.cats) > 4:
                         if state.fish_left > 1:
@@ -232,13 +237,15 @@ while True:
                             
                             state.fish = []
                             
-                            sb.prep_fish(score,state,screen)
+                            sb.prep_fish(state,screen)
 
                             continue
 
                         elif state.fish_left <= 1: 
                             fade_time_home = 3
-                            state.initiate(sb,play_button,settings,screen)
+                            state.initiate(sb,play_button,settings,screen,state)
+                            cat_position = {0:(600,400)}
+                            score = 0
                             home_flag = True
 
                 
