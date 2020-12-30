@@ -3,16 +3,15 @@ import pygame
 import time
 import random
 import math
+from pathlib import Path
 import shelve
-from time import sleep
 
 from Settings import Settings
 from GameState import GameState
-from Button import Play_Button, Exit_Button, About_Button, Return_Button, Void_High_Score, Home_Button, Msg_Fade_Minus, Msg_Fade_Plus, Fish_Fade, Game_Over
+from Button import *
 from BoxedCat import BoxedCat, Cat_Symbol, Multiply
 from Scoreboard import Scoreboard
-from cursor import Cursor_Paw
-
+from Cursor import Cursor_Paw
 
 state = GameState()
 settings = Settings()
@@ -24,13 +23,10 @@ pygame.display.set_caption("Catch Mitao!")
 bg0 = pygame.image.load('images/bg0.png')
 icon = pygame.image.load('images/icon.png')
 
-
 duration = 0
 time_left = 0
 fade_time_fish = 0
 fade_time_level = 0
-
-
 
 cat_position = {0:(600,400)}
 cat_sequence = 0
@@ -38,7 +34,8 @@ cat_sequence = 0
 score = 0
 get_score = 50
 
-d = shelve.open('score')
+Path("data").mkdir(parents=True, exist_ok=True)
+d = shelve.open('data/score')
 if  not 'high_score' in d:
     d['high_score'] = 0
     high_score = 0
@@ -54,18 +51,17 @@ play_button = Play_Button(screen, settings)
 exit_button = Exit_Button(screen, settings)
 about_button = About_Button(screen, settings)
 return_button = Return_Button(screen, settings)
-void_button = Void_High_Score(screen,sb,settings)
-home_button = Home_Button(screen,sb)
-fish_fade = Fish_Fade(screen,msg_fade_minus)
-game_over = Game_Over(screen,settings)
+void_button = Void_High_Score(screen, sb, settings)
+home_button = Home_Button(screen, sb)
+fish_fade = Fish_Fade(screen, msg_fade_minus)
+game_over = Game_Over(screen, settings)
 
 
 
 pygame.mixer.pre_init()
 pygame.mixer.init()
-cat_meow = pygame.mixer.Sound("cat_meow.wav")
-pop = pygame.mixer.Sound("pop.wav")
-# pre_music = pygame.mixer.Sound("pre_music.wav")
+cat_meow = pygame.mixer.Sound("music/cat_meow.wav")
+pop = pygame.mixer.Sound("music/pop.wav")
 
 pygame.mouse.set_visible(False)
 
@@ -75,7 +71,6 @@ multiply = Multiply(screen)
 
 
 d.close()
-
 
 
 music_flag = True
@@ -88,7 +83,6 @@ home_flag = False
 fade_flag_level = False
 enter_level_flag = True
 
-
 while True:
     
     if state.active:
@@ -98,9 +92,8 @@ while True:
 
         #produce bg music
         
-        pygame.mixer.music.load('bg_music.wav')
+        pygame.mixer.music.load('music/bg_music.wav')
         pygame.mixer.music.play()
-        
         
         while pygame.mixer.music.get_busy():
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -130,10 +123,10 @@ while True:
                                 cat_position.pop(cat.sequence)
 
                                 #produce the sound
-                                pygame.mixer.Channel(0).play(pygame.mixer.Sound(cat_meow))
+                                pygame.mixer.Channel(0).play(cat_meow)
 
                                 #deal with score
-                                d = shelve.open('score') 
+                                d = shelve.open('data/score') 
 
                                 #update score
 
@@ -159,7 +152,7 @@ while True:
                             score = 0
                             sb.prep_high_score(settings,high_score)
                             sb.prep_score(settings,score)
-                            d = shelve.open('score') 
+                            d = shelve.open('data/score') 
                             d['high_score'] = 0
                             d.close()
 
@@ -305,13 +298,12 @@ while True:
 
     else:
 
-        pygame.mixer.music.load('pre_music.wav')
+        pygame.mixer.music.load('music/pre_music.wav')
         pygame.mixer.music.play()
 
        
         while pygame.mixer.music.get_busy() and music_flag:
 
-           
             cursor_paw = Cursor_Paw(screen)
                 
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -381,8 +373,3 @@ while True:
             cursor_paw.draw_paw()
             pygame.display.flip()
 
-            
-
-
-   
-    

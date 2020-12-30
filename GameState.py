@@ -9,8 +9,7 @@ class GameState():
         self.cats = []
         self.fish_left = 5
         self.fish = []
-        score = 0
-        sb.prep_score(settings,score)
+        sb.prep_score(settings,0)
         sb.prep_fish(state,screen)
         play_button.msg_text = settings.button_font.render(play_button.msg, True, settings.button_text_color,settings.button_color)
 

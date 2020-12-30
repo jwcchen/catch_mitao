@@ -1,15 +1,6 @@
 import pygame
-
-import os
-
 import glob
-
 import random
-
-filelist= [file for file in os.listdir('images/cat') if file.endswith('.png')]
-
-
-#from pygame.sprite import Sprite
 
 class Box1():
     def __init__(self,screen, x, y):
@@ -69,10 +60,6 @@ class BoxedCat():
             if self.cat.rect.centery > self.box1.rect.centery:
                 state.cats.remove(self)
                 cat_position.pop(self.sequence)
-                # print(state.cats)
-                # print(self.cat.rect.centery,self.box1.rect.centery)
-                # print(self.sequence)
-                
             else:
                 if self.cat.rect.centery < self.box1.rect.centery - 40:
                     self.direction = self.direction * (-1)
@@ -112,10 +99,6 @@ class Multiply():
         self.image = pygame.image.load('images/multiply.png')
         self.rect = self.image.get_rect()
         self.rect.centerx = 450
-       
 
     def draw(self):
         self.screen.blit(self.image,self.rect)
-
-
-
