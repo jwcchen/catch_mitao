@@ -73,8 +73,6 @@ while True:
     if state.active:
         fade_time_home = 0
 
-        #produce bg music
-        
         mouse_x, mouse_y = pygame.mouse.get_pos()
         cursor_paw = Cursor_Paw(screen)
         start_time = time.time()
@@ -83,7 +81,6 @@ while True:
                 screen.fill(settings.bg_color)
                 game_over.draw(settings)
                 fade_time_home -= elapsed_time
-                pygame.display.flip()
             elif fade_time_home <  0:
                 state.active = False
                 state.home_flag = False
@@ -183,7 +180,6 @@ while True:
             sb.prep_level(settings,score,msg_fade_minus)
             sb.prep_cat(state, settings)
 
-
             #prep fish part 1
             if state.fish == []:
                 sb.prep_fish(state,screen)
@@ -209,7 +205,7 @@ while True:
                         state.initiate(sb,play_button,settings,screen,state)
                         score = 0
                         state.home_flag = True
-                        
+
             # prep fish part 2: show 'fish+1' on screen
             if state.fade_flag_fish == True:
                 if fade_time_fish >= 0:
@@ -251,14 +247,8 @@ while True:
             home_button.draw()
             cursor_paw.draw_paw()
 
-            pygame.display.flip()
-
             end_time = time.time()
             elapsed_time = end_time - start_time
-
-        if state.active and not pygame.mixer.music.get_busy():
-            pygame.mixer.music.load('music/bg_music.wav')
-            pygame.mixer.music.play()
     else:
         cursor_paw = Cursor_Paw(screen)
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -321,13 +311,13 @@ while True:
                         state.about_flag = False
 
             cursor_paw.draw_paw()
-            pygame.display.flip()
 
 
         cursor_paw.draw_paw()
-        pygame.display.flip()
 
-        if not state.active and not pygame.mixer.music.get_busy():
-            pygame.mixer.music.load('music/pre_music.wav')
-            pygame.mixer.music.play()
+    pygame.display.flip()
+    if not pygame.mixer.music.get_busy():
+        music = 'music/bg_music.wav' if state.active else 'music/pre_music.wav'
+        pygame.mixer.music.load(music)
+        pygame.mixer.music.play()
 
