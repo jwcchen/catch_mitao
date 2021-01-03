@@ -25,9 +25,8 @@ class Box2():
         self.screen.blit(self.image,self.rect)
 
 class Cat():
-    def __init__(self,screen, x, y):
+    def __init__(self, screen, x, y):
         self.screen = screen
-        
         self.image = pygame.image.load(random.choice(glob.glob('images/cat/*.png')))
         self.rect = self.image.get_rect()
         self.rect.centerx = x
@@ -38,8 +37,7 @@ class Cat():
         self.screen.blit(self.image,self.rect)
 
 class BoxedCat():
-    def __init__(self,screen, x, y):
-
+    def __init__(self, screen, x, y):
         self.box1 = Box1(screen, x, y)
         self.box2 = Box2(screen, x, y)
         self.cat = Cat(screen, x, y)
@@ -48,23 +46,24 @@ class BoxedCat():
         self.is_animating = False
         self.animation_time = None
         self.direction = 1
-        self.t2 = 0
-        self.sequence = 0
+        #self.id = boxed_cat_id
+        self.cat_position = (x, y)
+
 
     def animate(self, animation_time):
         self.is_animating = True
         self.animation_time = animation_time
 
-    def update(self, state, cat_position):
+    def update(self, state):
         if self.is_animating:
             if self.cat.rect.centery > self.box1.rect.centery:
                 state.cats.remove(self)
-                cat_position.pop(self.sequence)
+                #state.cat_position.pop(self.id)
             else:
                 if self.cat.rect.centery < self.box1.rect.centery - 40:
                     self.direction = self.direction * (-1)
                 
-                self.cat.y = self.cat.y - (40/self.animation_time) * 0.004 * self.direction
+                self.cat.y = self.cat.y - (40 / self.animation_time) * 0.004 * self.direction
                 self.cat.rect.centery = self.cat.y
 
     def draw(self):

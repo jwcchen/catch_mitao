@@ -1,59 +1,25 @@
 import pygame.font
 
-class Play_Button():
-    def __init__(self,screen,settings):
+class MainScreenButton():
+    def __init__(self, screen, msg, x, y, x_icon, y_icon, settings):
         self.screen = screen
         self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.centery = 350
-        self.rect.centerx = self.screen.get_rect().centerx - 250
-        self.msg = "Play"
+        self.rect.centery = y
+        self.rect.centerx = x
+        self.msg = msg
+        self.x_icon = x_icon
+        self.y_icon = y_icon
+        self.icon = pygame.image.load('images/icon.png')
         self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
         self.msg_text_rect = self.msg_text.get_rect()
         self.msg_text_rect.centery = self.rect.centery
         self.msg_text_rect.centerx = self.rect.centerx
         self.pop_flag = True
 
-    def draw(self,settings):
+    def draw(self, settings):
         self.screen.fill(settings.button_color,self.rect)
         self.screen.blit(self.msg_text,self.msg_text_rect)
-
-class Exit_Button():
-    def __init__(self,screen,settings):
-        self.screen = screen
-        self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.centery = 350
-        self.rect.centerx = screen.get_rect().centerx
-        self.msg = "Exit"
-        self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.centery = self.rect.centery
-        self.msg_text_rect.centerx = self.rect.centerx
-        self.pop_flag = True
-
-    def draw(self,settings):
-        self.screen.fill(settings.button_color,self.rect)
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
-
-
-class About_Button():
-    def __init__(self,screen,settings):
-        self.screen = screen
-        self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.centery = 350
-        self.rect.centerx = screen.get_rect().centerx + 250
-        self.msg = "About"
-        self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.centery = self.rect.centery
-        self.msg_text_rect.centerx = self.rect.centerx
-        self.pop_flag = True
-
-
-    def draw(self,settings):
-        self.screen.fill(settings.button_color,self.rect)
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
+        self.screen.blit(self.icon, (self.x_icon, self.y_icon))
 
 class Return_Button():
     def __init__(self,screen,settings):
