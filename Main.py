@@ -35,6 +35,8 @@ if  not 'high_score' in d:
     high_score = 0
 else:
     high_score = d['high_score']
+d.close()
+
 
 msg_fade_minus = Msg_Fade_Minus(screen,settings)
 msg_fade_plus = Msg_Fade_Plus(screen,settings)
@@ -50,6 +52,8 @@ home_button = Home_Button(screen, sb)
 fish_fade = Fish_Fade(screen, msg_fade_minus)
 game_over = Game_Over(screen, settings)
 
+cursor_paw = Cursor_Paw(screen)
+
 
 pygame.mixer.pre_init()
 pygame.mixer.init()
@@ -58,27 +62,77 @@ pop = pygame.mixer.Sound("music/pop.wav")
 
 pygame.mouse.set_visible(False)
 
-
 cat_symbol = Cat_Symbol(screen)
 multiply = Multiply(screen)
 
-
-d.close()
-
-stopped = False
-
 elapsed_time = 0
 while True:
-    
-    if state.active:
-        fade_time_home = 0
+    start_time = time.time()
+    mouse_x, mouse_y = pygame.mouse.get_pos()
 
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        cursor_paw = Cursor_Paw(screen)
-        start_time = time.time()
+    if not state.active:
+        screen.blit(bg0, (0, 0))
+        
+        if state.about_flag == False:  
+            for event in pygame.event.get():
+                for button in (play_button, exit_button, about_button):
+                    #if mouse on button, change font and color
+                    if button.msg_text_rect.collidepoint(mouse_x, mouse_y):
+
+                        button.msg_text = settings.button_font_new.render(button.msg, True, settings.button_text_color_new,settings.button_color)
+                        if button.pop_flag == True:
+                            pygame.mixer.Channel(1).play(pygame.mixer.Sound(pop))
+                            button.pop_flag = False
+                    else:
+                        button.msg_text = settings.button_font.render(button.msg, True, settings.button_text_color,settings.button_color)
+                        button.pop_flag = True
+                       
+                    #if button down, change font and color
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+
+                        if play_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
+                            state.active = True
+                            pygame.mixer.music.stop()
+                            stopped = True
+                            break
+                        if exit_button.msg_text_rect.collidepoint(mouse_x,mouse_y):
+                            sys.exit()
+
+                        if about_button.msg_text_rect.collidepoint(mouse_x,mouse_y):
+                            state.about_flag = True
+
+
+            #draw buttons        
+            play_button.draw(settings)
+            exit_button.draw(settings)
+            about_button.draw(settings)
+        else:
+            return_button.draw(settings)
+            
+            #if mouse on button, change font and color
+            if return_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
+
+                return_button.msg_text = settings.return_button_font.render(return_button.msg, True, settings.button_text_color_new,settings.button_color)
+                if return_button.pop_flag == True:
+                    pygame.mixer.Channel(1).play(pygame.mixer.Sound(pop))
+                    return_button.pop_flag = False
+            else:
+                return_button.msg_text = settings.return_button_font.render(return_button.msg, True, settings.button_text_color,settings.button_color)
+                return_button.pop_flag = True
+
+            #if button down, change font and color
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if return_button.return_rect.collidepoint(mouse_x,mouse_y):
+                        state.about_flag = False
+    
+    else:
+        screen.fill(settings.bg_color)
+
+        fade_time_home = 0
+        
         if state.home_flag == True:
             if fade_time_home >= 0:
-                screen.fill(settings.bg_color)
                 game_over.draw(settings)
                 fade_time_home -= elapsed_time
             elif fade_time_home <  0:
@@ -168,10 +222,6 @@ while True:
                 if not boxed_cat.is_animating:
                     boxed_cat.animate(0.5)
                 boxed_cat.update(state)
-
-            #draw boxed cats, add 'screen.fill' to product the animation effect
-            screen.fill(settings.bg_color)
-
             
             for boxed_cat in state.cats:
                 boxed_cat.draw()
@@ -245,79 +295,14 @@ while True:
             multiply.draw()
             void_button.draw()
             home_button.draw()
-            cursor_paw.draw_paw()
-
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-    else:
-        cursor_paw = Cursor_Paw(screen)
-        mouse_x, mouse_y = pygame.mouse.get_pos()
         
-        if state.about_flag == False:  
-            for event in pygame.event.get():
-                for button in (play_button,exit_button,about_button):
-                    #if mouse on button, change font and color
-                    if button.msg_text_rect.collidepoint(mouse_x, mouse_y):
-
-                        button.msg_text = settings.button_font_new.render(button.msg, True, settings.button_text_color_new,settings.button_color)
-                        if button.pop_flag == True:
-                            pygame.mixer.Channel(1).play(pygame.mixer.Sound(pop))
-                            button.pop_flag = False
-                    else:
-                        button.msg_text = settings.button_font.render(button.msg, True, settings.button_text_color,settings.button_color)
-                        button.pop_flag = True
-                       
-                    #if button down, change font and color
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-
-                        if play_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
-                            state.active = True
-                            pygame.mixer.music.stop()
-                            stopped = True
-                            break
-                        if exit_button.msg_text_rect.collidepoint(mouse_x,mouse_y):
-                            sys.exit()
-
-                        if about_button.msg_text_rect.collidepoint(mouse_x,mouse_y):
-                            state.about_flag = True
-
-
-            #draw buttons        
-            screen.blit(bg0, (0, 0))
-            play_button.draw(settings)
-            exit_button.draw(settings)
-            about_button.draw(settings)
-            
-                   
-        else:
-            screen.blit(bg0, (0, 0))
-            return_button.draw(settings)
-            
-            #if mouse on button, change font and color
-            if return_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
-
-                return_button.msg_text = settings.return_button_font.render(return_button.msg, True, settings.button_text_color_new,settings.button_color)
-                if return_button.pop_flag == True:
-                    pygame.mixer.Channel(1).play(pygame.mixer.Sound(pop))
-                    return_button.pop_flag = False
-            else:
-                return_button.msg_text = settings.return_button_font.render(return_button.msg, True, settings.button_text_color,settings.button_color)
-                return_button.pop_flag = True
-
-            #if button down, change font and color
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if return_button.return_rect.collidepoint(mouse_x,mouse_y):
-                        state.about_flag = False
-
-            cursor_paw.draw_paw()
-
-
-        cursor_paw.draw_paw()
-
+    cursor_paw.draw_paw(mouse_x, mouse_y)
     pygame.display.flip()
+    
     if not pygame.mixer.music.get_busy():
         music = 'music/bg_music.wav' if state.active else 'music/pre_music.wav'
         pygame.mixer.music.load(music)
         pygame.mixer.music.play()
 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
