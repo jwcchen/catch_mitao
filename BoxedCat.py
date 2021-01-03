@@ -46,7 +46,6 @@ class BoxedCat():
         self.is_animating = False
         self.animation_time = None
         self.direction = 1
-        #self.id = boxed_cat_id
         self.cat_position = (x, y)
 
 
@@ -58,7 +57,6 @@ class BoxedCat():
         if self.is_animating:
             if self.cat.rect.centery > self.box1.rect.centery:
                 state.cats.remove(self)
-                #state.cat_position.pop(self.id)
             else:
                 if self.cat.rect.centery < self.box1.rect.centery - 40:
                     self.direction = self.direction * (-1)
