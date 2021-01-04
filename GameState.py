@@ -1,11 +1,10 @@
 class GameState():
     def __init__(self):
+        self.stage = 'home' # 'about' 'play' 'over'
         self.cats = []
         self.fish = []
-        self.fish_left = 1
+        self.fish_left = 2
         self.score = 0
-
-        self.stage = 'home' # 'about' 'play' 'over'
 
         self.fade_flag_fish = False
         self.fade_flag_level = False
@@ -13,7 +12,7 @@ class GameState():
 
     def initiate(self,sb,play_button,settings,screen,state):
         self.cats = []
-        self.fish_left = 1
+        self.fish_left = 2
         self.fish = []
         self.score = 0
         sb.prep_score(settings, 0)

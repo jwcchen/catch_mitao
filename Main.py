@@ -52,8 +52,9 @@ cat_symbol = Cat_Symbol(screen)
 multiply = Multiply(screen)
 cursor_paw = Cursor_Paw(screen)
 
+is_running = True
 elapsed_time = 0
-while True:
+while is_running:
     start_time = time.time()
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -72,14 +73,18 @@ while True:
             button.draw()
 
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type  == pygame.QUIT:
+                is_running = False
+                break
+            elif event.type == pygame.MOUSEBUTTONDOWN:
 
                 if play_button.text_button.check_hovering(mouse_x, mouse_y):
                     state.stage = 'play'
                     pygame.mixer.music.stop()
                     break
                 if exit_button.text_button.check_hovering(mouse_x, mouse_y):
-                    sys.exit()
+                    is_running = False
+                    break
                 if about_button.text_button.check_hovering(mouse_x, mouse_y):
                     state.stage = 'about'
                     break
@@ -96,7 +101,10 @@ while True:
         return_button.draw(settings)
 
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type  == pygame.QUIT:
+                is_running = False
+                break
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 if return_button.text_button.check_hovering(mouse_x,mouse_y):
                     state.stage = 'home'
                     break
@@ -104,7 +112,9 @@ while True:
         screen.fill(settings.bg_color)
 
         for event in pygame.event.get():
-            pass
+            if event.type  == pygame.QUIT:
+                is_running = False
+                break
         if fade_time_home >= 0:
             fade_time_home -= elapsed_time
         else:
@@ -114,60 +124,31 @@ while True:
     elif state.stage == 'play':
         screen.fill(settings.bg_color)
 
-        settings.generation_time = 0.7 * (0.9 ** (state.score // 750))
         for event in pygame.event.get():
             if event.type  == pygame.QUIT:
-                sys.exit()
+                is_running = False
+                break
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for boxed_cat in state.cats:
                     if boxed_cat.cat.rect.collidepoint(mouse_x, mouse_y):
                         state.cats.remove(boxed_cat)
-
-                        #produce the sound
                         cat_meow = pygame.mixer.Sound("music/cat_meow.wav")
                         pygame.mixer.Channel(0).play(cat_meow)
 
-                        #deal with score
-                        d = shelve.open('data/score') 
-
-                        #update score
                         state.score += 50
-                        sb.prep_score(settings,state.score)
-                        #update high score
-                        if state.score > high_score:
-                            high_score = state.score
-
-                        sb.prep_high_score(settings,high_score)
-                        
-                        #update documented high_score                        
-                        if d['high_score'] < high_score:
-                            d['high_score'] = high_score   
-                        d.close()
-                        
-                #clear button to reset all scores to 0
-                if void_button.msg_text_rect.collidepoint(pygame.mouse.get_pos()):
+                        high_score = max(high_score, state.score)
+                if void_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
                     high_score = 0
                     state.score = 0
-                    sb.prep_high_score(settings,high_score)
-                    sb.prep_score(settings, state.score)
-                    d = shelve.open('data/score') 
-                    d['high_score'] = 0
-                    d.close()
-
-                #when press home button, restart the game
-                if home_button.rect.collidepoint(pygame.mouse.get_pos()):
+                if home_button.rect.collidepoint(mouse_x, mouse_y):
                     state.stage = 'home'
                     state.initiate(sb,play_button,settings,screen,state)
-                    pygame.mixer.music.stop()
-                    state.score = 0                           
+                    pygame.mixer.music.stop()                          
                     break
         
         #control the animation of each boxed cat(distance, time)  
         time_left -= elapsed_time
-        
-        
         if time_left < 0:
-            # test += 1
             while True:
                 min_distance = 100000000
                 x = random.randint(100,1100)
@@ -182,14 +163,11 @@ while True:
                     state.cats.append(boxed_cat)
                     break
               
-            time_left = settings.generation_time
+            generation_time = 0.7 * (0.9 ** (state.score // 750))
+            time_left = generation_time
 
         for boxed_cat in state.cats:
-            if not boxed_cat.is_animating:
-                boxed_cat.animate(0.5)
             boxed_cat.update(state)
-        
-        for boxed_cat in state.cats:
             boxed_cat.draw()
         
         #show level and number of boxed cat
@@ -219,7 +197,7 @@ while True:
                 elif state.fish_left <= 1: 
                     fade_time_home = 3
                     state.initiate(sb,play_button,settings,screen,state)
-                    state.stage == 'home'
+                    state.stage = 'over'
 
         # prep fish part 2: show 'fish+1' on screen
         if state.fade_flag_fish == True:
@@ -229,7 +207,6 @@ while True:
                 fade_time_fish -= elapsed_time
             elif fade_time_fish <  0:
                 state.fade_flag_fish = False
-
 
         for fish in state.fish:
             fish.draw()
@@ -255,6 +232,8 @@ while True:
                 state.fade_flag_level = False
 
         #draw
+        sb.prep_score(settings, state.score)
+        sb.prep_high_score(settings, high_score)
         sb.draw_score()
         cat_symbol.draw()
         multiply.draw()
@@ -271,3 +250,8 @@ while True:
 
     end_time = time.time()
     elapsed_time = end_time - start_time
+
+
+d = shelve.open('data/score') 
+d['high_score'] = high_score
+d.close()

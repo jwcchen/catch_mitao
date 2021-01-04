@@ -7,8 +7,6 @@ class Settings():
         self.screen_width = 1200
         self.screen_height = 800
         self.bg_color = (252,220,226)
-        self.generation_time = 0.7
-        
         
         self.button_font = pygame.font.SysFont("Arial Rounded", 48)
         self.button_color = (252,220,226)

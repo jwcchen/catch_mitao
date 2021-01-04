@@ -43,26 +43,18 @@ class BoxedCat():
         self.cat = Cat(screen, x, y)
         self.box1.rect.center = self.cat.rect.center
         self.box2.rect.center = self.box1.rect.center
-        self.is_animating = False
-        self.animation_time = None
         self.direction = 1
         self.cat_position = (x, y)
 
-
-    def animate(self, animation_time):
-        self.is_animating = True
-        self.animation_time = animation_time
-
     def update(self, state):
-        if self.is_animating:
-            if self.cat.rect.centery > self.box1.rect.centery:
-                state.cats.remove(self)
-            else:
-                if self.cat.rect.centery < self.box1.rect.centery - 40:
-                    self.direction = self.direction * (-1)
-                
-                self.cat.y = self.cat.y - (40 / self.animation_time) * 0.004 * self.direction
-                self.cat.rect.centery = self.cat.y
+        if self.cat.rect.centery > self.box1.rect.centery:
+            state.cats.remove(self)
+        else:
+            if self.cat.rect.centery < self.box1.rect.centery - 40:
+                self.direction = self.direction * (-1)
+            animation_time = 0.5
+            self.cat.y = self.cat.y - (40 / animation_time) * 0.004 * self.direction
+            self.cat.rect.centery = self.cat.y
 
     def draw(self):
         self.box1.draw()
