@@ -1,64 +1,84 @@
 import pygame.font
 
-from BoxedCat import Fish
+from Settings import settings
+
+y_alignment = 30
+
+class Void_High_Score():
+    def __init__(self,screen):
+        self.screen = screen
+        self.msg = "CLEAR"
+        self.image = settings.font_small.render(self.msg, True, settings.score_text_color, settings.button_color)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = screen.get_rect().centerx + 400
+        self.rect.centery = y_alignment
+
+    def draw(self):
+        self.screen.blit(self.image, self.rect)
+
+
+class Home_Button():
+    def __init__(self,screen):
+        self.screen = screen
+        self.image = pygame.image.load('images/home.png')
+        self.rect = self.image.get_rect()
+        self.rect.right = screen.get_rect().right - 10
+        self.rect.centery = y_alignment
+
+    def draw(self):
+        self.screen.blit(self.image,self.rect)
 
 class Scoreboard():
-    def __init__(self,screen,settings,score,high_score,state,msg_fade):
+    def __init__(self,screen):
         self.screen = screen
-
-        self.text_color = (255,255,255)
         self.font = pygame.font.SysFont(None, 48)
+        self.fish_image = pygame.image.load('images/fish.png')
+        self.cat_image = pygame.image.load('images/cat_symbol.png')
+        self.multiply_image = pygame.image.load('images/multiply.png')
+        self.void_button = Void_High_Score(screen)
+        self.home_button = Home_Button(screen)
 
-    
-        self.prep_score(settings,score)
-        self.prep_high_score(settings,high_score)
-        self.prep_level(settings,score,msg_fade)
-        self.prep_cat(state, settings)
+    def draw(self, score, high_score, n_cat, fish_left):
+        level = "L" + str(score // 750 + 1)
+        level_image = self.font.render(level, True, settings.score_text_color, settings.bg_color)
+        level_rect = level_image.get_rect()
+        level_rect.left = 10
+        level_rect.centery = y_alignment
+        self.screen.blit(level_image, level_rect)
 
-    def prep_score(self,settings,score):
-        #round it to nearest 10 and change integer to string
-        rounded_score = int(round(score,-1))
-        score_str = "{:,}".format(rounded_score)
-        self.score_image = self.font.render(score_str,True,self.text_color,settings.bg_color)
-        self.score_image_rect = self.score_image.get_rect()
-        self.score_image_rect.right = self.screen.get_rect().right - 350
-        self.score_image_rect.centery = self.score_image_rect.centery + 10
+        for i in range(fish_left):
+            fish_rect = self.fish_image.get_rect()
+            fish_rect.x = 50 + i * fish_rect.width
+            fish_rect.centery = y_alignment
+            self.screen.blit(self.fish_image, fish_rect)
 
-    def prep_high_score(self,settings,high_score):
-        rounded_high_score = int(round(high_score,-1))
-        high_score_string = "{:,}".format(rounded_high_score)
-        self.high_score_image = self.font.render(high_score_string,True,self.text_color,settings.bg_color)
-        self.high_score_image_rect = self.high_score_image.get_rect()
-        self.high_score_image_rect.centerx = self.screen.get_rect().centerx + 50
-        self.high_score_image_rect.centery = self.score_image_rect.centery
+        score_image = self.font.render(str(score), True, settings.score_text_color, settings.bg_color)
+        score_rect = score_image.get_rect()
+        score_rect.right = self.screen.get_rect().right - 350
+        score_rect.centery = y_alignment
+        self.screen.blit(score_image, score_rect)
 
-    def prep_level(self, settings, score,msg_fade):
-        level = "L" + str((score // 750)+1)
-        self.level_image = self.font.render(level, True, self.text_color, settings.bg_color)
-        self.level_image_rect = self.level_image.get_rect()
-        self.level_image_rect.left, self.level_image_rect.top = 10, 10
-    
-    def prep_fish(self,state,screen):
-        
-        for fish_number in range(state.fish_left):
-                create_fish = Fish(screen)
-                create_fish_rect = create_fish.rect
-                create_fish.rect.x = 50 + fish_number * create_fish.rect.width
-                # create_fish.rect.y = 10
-                state.fish.append(create_fish)
+        high_score_image = self.font.render(str(high_score), True, settings.score_text_color, settings.bg_color)
+        high_score_rect = high_score_image.get_rect()
+        high_score_rect.centerx = self.screen.get_rect().centerx + 50
+        high_score_rect.centery = y_alignment
+        self.screen.blit(high_score_image, high_score_rect)
 
-    def prep_cat(self, state, settings):
-        n_cat = str(len(state.cats))
-        self.n_cat_image = self.font.render(n_cat, True, self.text_color, settings.bg_color)
-        self.n_cat_image_rect = self.n_cat_image.get_rect()
-        
-        self.n_cat_image_rect.centerx = self.screen.get_rect().centerx - 110
-        self.n_cat_image_rect.centery = self.score_image_rect.centery
-        
+        cat_rect = self.cat_image.get_rect()
+        cat_rect.centerx = 400
+        cat_rect.centery = y_alignment
+        self.screen.blit(self.cat_image, cat_rect)
 
-    def draw_score(self):
-        self.screen.blit(self.level_image,self.level_image_rect)
-        self.screen.blit(self.score_image,self.score_image_rect)
-        self.screen.blit(self.high_score_image,self.high_score_image_rect)
-        self.screen.blit(self.n_cat_image,self.n_cat_image_rect)
-        
+        multiply_rect = self.multiply_image.get_rect()
+        multiply_rect.centerx = 450
+        multiply_rect.centery = y_alignment
+        self.screen.blit(self.multiply_image, multiply_rect)
+
+        n_cat_image = self.font.render(str(n_cat), True, settings.score_text_color, settings.bg_color)
+        n_cat_rect = n_cat_image.get_rect()
+        n_cat_rect.centerx = self.screen.get_rect().centerx - 110
+        n_cat_rect.centery = y_alignment
+        self.screen.blit(n_cat_image, n_cat_rect)
+
+        self.void_button.draw()
+        self.home_button.draw()

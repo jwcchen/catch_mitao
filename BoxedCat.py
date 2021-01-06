@@ -60,34 +60,3 @@ class BoxedCat():
         self.box1.draw()
         self.cat.draw()
         self.box2.draw()
-
-
-class Fish():
-    def __init__(self, screen):
-        self.screen = screen
-        self.image = pygame.image.load('images/fish.png')
-        self.rect = self.image.get_rect()
-
-    def draw(self):
-        self.screen.blit(self.image,self.rect)
-
-class Cat_Symbol():
-    def __init__(self,screen):
-        self.screen = screen
-        self.image = pygame.image.load('images/cat_symbol.png')
-        self.rect = self.image.get_rect()
-        self.rect.centerx = 400
-       
-
-    def draw(self):
-        self.screen.blit(self.image,self.rect)
-
-class Multiply():
-    def __init__(self,screen):
-        self.screen = screen
-        self.image = pygame.image.load('images/multiply.png')
-        self.rect = self.image.get_rect()
-        self.rect.centerx = 450
-
-    def draw(self):
-        self.screen.blit(self.image,self.rect)

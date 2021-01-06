@@ -11,6 +11,7 @@ class Settings():
         self.button_font = pygame.font.SysFont("Arial Rounded", 48)
         self.button_color = (252,220,226)
         self.button_text_color = (252,174,187)
+        self.score_text_color = (255, 255, 255)
 
         self.button_width, self.button_height = 200,150 
 

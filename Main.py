@@ -9,7 +9,7 @@ import shelve
 from Settings import settings
 from GameState import GameState
 from Button import *
-from BoxedCat import BoxedCat, Cat_Symbol, Multiply
+from BoxedCat import BoxedCat
 from Scoreboard import Scoreboard
 from Cursor import Cursor_Paw
 
@@ -23,7 +23,7 @@ pygame.mouse.set_visible(False)
 
 state = GameState()
 
-time_left = 0
+generation_timer = 0
 fade_time_fish = 0
 fade_time_level = 0
 fade_time_home = 0
@@ -32,24 +32,20 @@ Path("data").mkdir(parents=True, exist_ok=True)
 d = shelve.open('data/score')
 if  not 'high_score' in d:
     d['high_score'] = 0
-    high_score = 0
+    state.high_score = 0
 else:
-    high_score = d['high_score']
+    state.high_score = d['high_score']
 d.close()
 
 msg_fade_minus = Msg_Fade_Minus(screen,settings)
 msg_fade_plus = Msg_Fade_Plus(screen,settings)
-sb = Scoreboard(screen,settings,state.score,high_score,state,msg_fade_minus)
+scoreboard = Scoreboard(screen)
 play_button = MainScreen_Button(screen, "Play", screen.get_rect().centerx - 250, 350)
 exit_button = MainScreen_Button(screen, "Exit", screen.get_rect().centerx, 350)
 about_button = MainScreen_Button(screen, "About", screen.get_rect().centerx + 250, 350)
 return_button = Return_Button(screen, "This is my first game. Hope you enjoy it!", 600, 350)
-void_button = Void_High_Score(screen, sb, settings)
-home_button = Home_Button(screen, sb)
 fish_fade = Fish_Fade(screen, msg_fade_minus)
 game_over = Game_Over(screen)
-cat_symbol = Cat_Symbol(screen)
-multiply = Multiply(screen)
 cursor_paw = Cursor_Paw(screen)
 
 is_running = True
@@ -136,68 +132,46 @@ while is_running:
                         pygame.mixer.Channel(0).play(cat_meow)
 
                         state.score += 50
-                        high_score = max(high_score, state.score)
-                if void_button.msg_text_rect.collidepoint(mouse_x, mouse_y):
-                    high_score = 0
+                        state.high_score = max(state.high_score, state.score)
+                if scoreboard.void_button.rect.collidepoint(mouse_x, mouse_y):
+                    state.high_score = 0
                     state.score = 0
-                if home_button.rect.collidepoint(mouse_x, mouse_y):
+                if scoreboard.home_button.rect.collidepoint(mouse_x, mouse_y):
                     state.stage = 'home'
-                    state.initiate(sb,play_button,settings,screen,state)
+                    state.reset()
                     pygame.mixer.music.stop()                          
                     break
         
-        #control the animation of each boxed cat(distance, time)  
-        time_left -= elapsed_time
-        if time_left < 0:
+        generation_timer -= elapsed_time
+        if generation_timer < 0:
             while True:
                 min_distance = 100000000
-                x = random.randint(100,1100)
-                y = random.randint(200,700)
+                x = random.randint(100, 1100)
+                y = random.randint(200, 700)
                 for boxed_cat in state.cats:
-                    distance = math.sqrt((x-boxed_cat.cat_position[0])**2 + (y-boxed_cat.cat_position[1])**2)
+                    distance = math.sqrt((x - boxed_cat.cat_position[0]) ** 2 + (y - boxed_cat.cat_position[1]) ** 2)
                     min_distance = min(min_distance, distance)
 
                 if min_distance > 200:
-                    #state.cat_id = state.cat_id + 1
                     boxed_cat = BoxedCat(screen, x, y)
                     state.cats.append(boxed_cat)
                     break
-              
-            generation_time = 0.7 * (0.9 ** (state.score // 750))
-            time_left = generation_time
+            generation_timer = 0.7 * (0.9 ** (state.score // 750))
 
         for boxed_cat in state.cats:
             boxed_cat.update(state)
             boxed_cat.draw()
         
-        #show level and number of boxed cat
-        sb.prep_level(settings,state.score,msg_fade_minus)
-        sb.prep_cat(state, settings)
-
-        #prep fish part 1
-        if state.fish == []:
-            sb.prep_fish(state,screen)
-        else:
-            if len(state.cats) > 4:
-                if state.fish_left > 1:
-                    state.fish_left -= 1
-                    
-                    state.cats = []
-
-                    fade_time_fish = 0.5
-                    
-                    state.fade_flag_fish = True
-                    
-                    state.fish = []
-                    
-                    sb.prep_fish(state,screen)
-
-                    continue
-
-                elif state.fish_left <= 1: 
-                    fade_time_home = 3
-                    state.initiate(sb,play_button,settings,screen,state)
-                    state.stage = 'over'
+        if len(state.cats) >= 5:
+            state.fish_left -= 1
+            if state.fish_left > 0:
+                state.cats = []
+                fade_time_fish = 0.5
+                state.fade_flag_fish = True
+            elif state.fish_left <= 1: 
+                fade_time_home = 3
+                state.reset(scoreboard,play_button,settings,screen,state)
+                state.stage = 'over'
 
         # prep fish part 2: show 'fish+1' on screen
         if state.fade_flag_fish == True:
@@ -208,10 +182,7 @@ while is_running:
             elif fade_time_fish <  0:
                 state.fade_flag_fish = False
 
-        for fish in state.fish:
-            fish.draw()
-
-        #'level-1'  initiate the level-1 settings
+        #'level-1'  reset the level-1 settings
         if state.score % 750 == 0 and state.score != 0:
             if state.enter_level_flag == True:
                 state.fade_flag_level = True
@@ -231,14 +202,7 @@ while is_running:
             elif fade_time_level < 0:
                 state.fade_flag_level = False
 
-        #draw
-        sb.prep_score(settings, state.score)
-        sb.prep_high_score(settings, high_score)
-        sb.draw_score()
-        cat_symbol.draw()
-        multiply.draw()
-        void_button.draw()
-        home_button.draw()
+        scoreboard.draw(state.score, state.high_score, len(state.cats), state.fish_left)
         
     cursor_paw.draw_paw(mouse_x, mouse_y)
     pygame.display.flip()
@@ -253,5 +217,5 @@ while is_running:
 
 
 d = shelve.open('data/score') 
-d['high_score'] = high_score
+d['high_score'] = state.high_score
 d.close()

@@ -1,5 +1,6 @@
 import pygame.font
 from Settings import settings
+import Scoreboard
 
 class Text_Button():
     def __init__(self, screen, msg, x, y, font_size, font_size_hovering):
@@ -53,46 +54,6 @@ class Return_Button():
         self.screen.fill(settings.button_color,self.return_rect)
         self.text_button.draw()
 
-class Void_High_Score():
-    def __init__(self,screen,sb,settings):
-        self.screen = screen
-        self.msg = "CLEAR"
-        self.msg_text = settings.font_small.render(self.msg, True, sb.text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.centery = sb.score_image_rect.centery
-        self.msg_text_rect.centerx = screen.get_rect().centerx + 400
-
-    def draw(self):
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
-
-class Home_Button():
-    def __init__(self,screen,sb):
-        self.screen = screen
-        self.image = pygame.image.load('images/home.png')
-        self.rect = self.image.get_rect()
-        self.rect.centery = sb.score_image_rect.centery
-        self.rect.right = screen.get_rect().right - 10
-
-
-    def draw(self):
-        self.screen.blit(self.image,self.rect)
-
-class Msg_Fade_Minus():
-    def __init__(self,screen,settings):
-        self.screen = screen
-        self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.center = screen.get_rect().center
-        self.msg = "- 1"
-        self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.center = self.rect.center
-        
-
-    def draw(self,settings):
-        self.screen.fill(settings.button_color,self.rect)
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
 class Msg_Fade_Plus():
     def __init__(self,screen,settings):
         self.screen = screen
@@ -117,8 +78,8 @@ class Msg_Fade_Minus():
         self.msg = "-1"
         self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
         self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.centery = self.rect.centery
-        self.msg_text_rect.centerx = self.rect.centerx
+        self.msg_text_rect.center = self.rect.center
+        
 
     def draw(self,settings):
         self.screen.fill(settings.button_color,self.rect)
