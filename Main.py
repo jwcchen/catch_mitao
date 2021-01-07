@@ -13,7 +13,6 @@ from BoxedCat import BoxedCat
 from Scoreboard import Scoreboard
 from Cursor import Cursor_Paw
 
-
 pygame.init()
 pygame.display.set_caption("Catch Mitao!")
 screen = pygame.display.set_mode((settings.screen_width,settings.screen_height))
@@ -22,11 +21,6 @@ pygame.mixer.init()
 pygame.mouse.set_visible(False)
 
 state = GameState()
-
-generation_timer = 0
-fade_time_fish = 0
-fade_time_level = 0
-fade_time_home = 0
 
 Path("data").mkdir(parents=True, exist_ok=True)
 d = shelve.open('data/score')
@@ -37,19 +31,20 @@ else:
     state.high_score = d['high_score']
 d.close()
 
-msg_fade_minus = Msg_Fade_Minus(screen,settings)
-msg_fade_plus = Msg_Fade_Plus(screen,settings)
 scoreboard = Scoreboard(screen)
 play_button = MainScreen_Button(screen, "Play", screen.get_rect().centerx - 250, 350)
 exit_button = MainScreen_Button(screen, "Exit", screen.get_rect().centerx, 350)
 about_button = MainScreen_Button(screen, "About", screen.get_rect().centerx + 250, 350)
 return_button = Return_Button(screen, "This is my first game. Hope you enjoy it!", 600, 350)
-fish_fade = Fish_Fade(screen, msg_fade_minus)
-game_over = Game_Over(screen)
+fish_notification = Note_Fish(screen)
+level_notification = Note_Msg(screen,"Level + 1")
+game_over = Note_Msg(screen, "Oops! No fish left!")
 cursor_paw = Cursor_Paw(screen)
 
 is_running = True
 elapsed_time = 0
+generation_timer = 0
+fade_time_home = 0
 while is_running:
     start_time = time.time()
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -133,6 +128,8 @@ while is_running:
 
                         state.score += 50
                         state.high_score = max(state.high_score, state.score)
+                        if state.score % 750 == 0:
+                            level_notification.timer = 0.5
                 if scoreboard.void_button.rect.collidepoint(mouse_x, mouse_y):
                     state.high_score = 0
                     state.score = 0
@@ -166,41 +163,17 @@ while is_running:
             state.fish_left -= 1
             if state.fish_left > 0:
                 state.cats = []
-                fade_time_fish = 0.5
-                state.fade_flag_fish = True
+                fish_notification.timer = 0.5
             elif state.fish_left <= 1: 
                 fade_time_home = 3
-                state.reset(scoreboard,play_button,settings,screen,state)
+                state.reset()
                 state.stage = 'over'
 
-        # prep fish part 2: show 'fish+1' on screen
-        if state.fade_flag_fish == True:
-            if fade_time_fish >= 0:
-                msg_fade_minus.draw(settings)
-                fish_fade.draw()
-                fade_time_fish -= elapsed_time
-            elif fade_time_fish <  0:
-                state.fade_flag_fish = False
+        fish_notification.update(elapsed_time)
+        fish_notification.draw()
 
-        #'level-1'  reset the level-1 settings
-        if state.score % 750 == 0 and state.score != 0:
-            if state.enter_level_flag == True:
-                state.fade_flag_level = True
-                fade_time_level = 0.5
-                
-        #test then disable the previous part immediately to avoid initiating again the level settings 
-        if state.score % 750 == 0 and state.score != 0:
-            state.enter_level_flag = False
-        else:
-            state.enter_level_flag = True
-        
-        #draw 'level-1' on screen in the fade time
-        if state.fade_flag_level == True:
-            if fade_time_level >= 0:
-                msg_fade_plus.draw(settings)
-                fade_time_level -= elapsed_time
-            elif fade_time_level < 0:
-                state.fade_flag_level = False
+        level_notification.update(elapsed_time)
+        level_notification.draw()
 
         scoreboard.draw(state.score, state.high_score, len(state.cats), state.fish_left)
         

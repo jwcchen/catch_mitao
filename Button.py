@@ -54,56 +54,37 @@ class Return_Button():
         self.screen.fill(settings.button_color,self.return_rect)
         self.text_button.draw()
 
-class Msg_Fade_Plus():
-    def __init__(self,screen,settings):
+class Note_Msg():
+    def __init__(self, screen, msg):
         self.screen = screen
-        self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.center = screen.get_rect().center
-        self.msg = "Level + 1"
-        self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.center = self.rect.center
-        
-
-    def draw(self,settings):
-        self.screen.fill(settings.button_color,self.rect)
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
-class Msg_Fade_Minus():
-    def __init__(self,screen,settings):
-        self.screen = screen
-        self.rect = pygame.Rect(0,0,settings.button_width,settings.button_height)
-        self.rect.centery = 350
-        self.rect.centerx = screen.get_rect().centerx
-        self.msg = "-1"
-        self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
-        self.msg_text_rect = self.msg_text.get_rect()
-        self.msg_text_rect.center = self.rect.center
-        
-
-    def draw(self,settings):
-        self.screen.fill(settings.button_color,self.rect)
-        self.screen.blit(self.msg_text,self.msg_text_rect)
-
-class Fish_Fade():
-    def __init__(self,screen,msg_fade):
-        self.screen = screen
-        self.image = pygame.image.load('images/fish.png')
-        self.rect = self.image.get_rect()
-        self.rect.centery = msg_fade.rect.centery
-        self.rect.centerx = msg_fade.rect.centerx - 60
-       
-
-    def draw(self):
-        self.screen.blit(self.image,self.rect)
-
-class Game_Over():
-    def __init__(self, screen):
-        self.screen = screen
-        self.msg = "Oops! No Fish Left!"
+        self.msg = msg
         self.msg_text = settings.button_font.render(self.msg, True, settings.button_text_color,settings.button_color)
         self.msg_text_rect = self.msg_text.get_rect()
         self.msg_text_rect.center = self.screen.get_rect().center
-        
+        self.timer = 0
+
+    def update(self, elapsed_time):
+        self.timer = max(self.timer - elapsed_time, 0)
+
     def draw(self):
-        self.screen.blit(self.msg_text,self.msg_text_rect)
+        if self.timer > 0:
+            self.screen.blit(self.msg_text,self.msg_text_rect)
+
+class Note_Fish():
+    def __init__(self, screen):
+        self.screen = screen
+        self.msg = Note_Msg(screen, "-1")
+        self.image = pygame.image.load('images/fish.png')
+        self.rect = self.image.get_rect()
+        self.rect.centery = self.msg.msg_text_rect.centery
+        self.rect.centerx = self.msg.msg_text_rect.centerx - 60
+        self.timer = 0
+
+    def update(self, elapsed_time):
+        self.timer = max(self.timer - elapsed_time, 0)
+        self.msg.timer = self.timer
+
+    def draw(self):
+        if self.timer > 0:
+            self.msg.draw()
+            self.screen.blit(self.image, self.rect)
