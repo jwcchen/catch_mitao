@@ -38,13 +38,13 @@ about_button = MainScreen_Button(screen, "About", screen.get_rect().centerx + 25
 return_button = Return_Button(screen, "This is my first game. Hope you enjoy it!", 600, 350)
 fish_notification = Note_Fish(screen)
 level_notification = Note_Msg(screen,"Level + 1")
-game_over = Note_Msg(screen, "Oops! No fish left!")
+over_notification = Note_Msg(screen, "Oops! No fish left!")
 cursor_paw = Cursor_Paw(screen)
 
 is_running = True
 elapsed_time = 0
 generation_timer = 0
-fade_time_home = 0
+
 while is_running:
     start_time = time.time()
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -106,12 +106,16 @@ while is_running:
             if event.type  == pygame.QUIT:
                 is_running = False
                 break
-        if fade_time_home >= 0:
-            fade_time_home -= elapsed_time
-        else:
+        
+        over_notification.update(elapsed_time)
+        over_notification.draw()
+
+        print(over_notification.timer)
+
+        if over_notification.timer == 0:
             state.stage = 'home'
             pygame.mixer.music.stop()
-        game_over.draw()
+        
     elif state.stage == 'play':
         screen.fill(settings.bg_color)
 
@@ -164,8 +168,8 @@ while is_running:
             if state.fish_left > 0:
                 state.cats = []
                 fish_notification.timer = 0.5
-            elif state.fish_left <= 1: 
-                fade_time_home = 3
+            elif state.fish_left <= 1:
+                over_notification.timer = 3
                 state.reset()
                 state.stage = 'over'
 

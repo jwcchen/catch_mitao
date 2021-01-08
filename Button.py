@@ -88,3 +88,4 @@ class Note_Fish():
         if self.timer > 0:
             self.msg.draw()
             self.screen.blit(self.image, self.rect)
+
