@@ -1,4 +1,4 @@
-# 1.state: if several states, do not use true/false statement. Instead, separately write the codes in the states 
+# 1.state: if several states, do not use true/false statement. Instead, separate the codes by the states 
 # 2.flags: use timer defined in instance instead of flags to achieve animation.
 # 3.if two or more classes have similar parts, incorporate the similar part into the different one. 
 # Instead of creating different classes, pass in the different parameters into the function.
