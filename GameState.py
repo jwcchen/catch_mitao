@@ -6,5 +6,5 @@ class GameState():
 
     def reset(self):
         self.cats = []
-        self.fish_left = 2
+        self.fish_left = 5
         self.score = 0

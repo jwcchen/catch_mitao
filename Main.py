@@ -110,8 +110,6 @@ while is_running:
         over_notification.update(elapsed_time)
         over_notification.draw()
 
-        print(over_notification.timer)
-
         if over_notification.timer == 0:
             state.stage = 'home'
             pygame.mixer.music.stop()
@@ -168,7 +166,7 @@ while is_running:
             if state.fish_left > 0:
                 state.cats = []
                 fish_notification.timer = 0.5
-            elif state.fish_left <= 1:
+            elif state.fish_left < 1:
                 over_notification.timer = 3
                 state.reset()
                 state.stage = 'over'

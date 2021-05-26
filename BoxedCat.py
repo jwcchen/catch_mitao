@@ -52,7 +52,7 @@ class BoxedCat():
         else:
             if self.cat.rect.centery < self.box1.rect.centery - 40:
                 self.direction = self.direction * (-1)
-            animation_time = 0.5
+            animation_time = 1
             self.cat.y = self.cat.y - (40 / animation_time) * 0.004 * self.direction
             self.cat.rect.centery = self.cat.y
 
